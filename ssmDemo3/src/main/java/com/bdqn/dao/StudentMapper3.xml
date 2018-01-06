@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bdqn.dao.StudentMapper3">
+    <resultMap id="studentMap" type="Student3">
+        <id property="id" column="id"/>
+        <result property="studentName" column="student_name"/>
+        <result property="studentNum" column="student_num"/>
+        <association property="grade3" resultMap="gradeMap"/>
+    </resultMap>
+    <resultMap id="gradeMap" type="Grade3">
+        <id property="id" column="g_id"/>
+        <result property="gradeName" column="grade_name"/>
+    </resultMap>
+
+    <select id="queryAll" resultMap="studentMap">
+        SELECT
+          s.*,
+          g.`id` AS g_id,
+          g.`grade_name`
+        FROM
+          `student` s,
+          `grade` g
+        WHERE s.`grade_id` = g.`id` ORDER by s.id DESC
+    </select>
+    <delete id="deleteStudentByIds" parameterType="Integer">
+            DELETE
+            FROM `student`
+            WHERE id IN
+            <foreach collection="list" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+    </delete>
+    <insert id="addStudent" parameterType="Student3">
+        INSERT INTO `student`
+        VALUES (NULL,
+                #{grade3.id},
+                #{studentName},
+               #{gender},
+                #{age},
+                #{studentNum})
+    </insert>
+    <select id="queryStudentById" parameterType="Integer" resultMap="studentMap">
+              SELECT
+          s.*,
+          g.`id` AS g_id,
+          g.`grade_name`
+        FROM
+          `student` s,
+          `grade` g
+        WHERE s.`grade_id` = g.`id` and s.id = #{id}
+    </select>
+    <update id="updateStudent" parameterType="Student3">
+        UPDATE `student`
+        SET
+          `grade_id` = #{grade3.id},
+          `student_name` = #{studentName},
+          `gender` = #{gender},
+          `age` = #{age}
+        WHERE `id` = #{id}
+    </update>
+    <select id="queryStudentByGradeId" resultMap="studentMap">
+        SELECT * FROM `student` WHERE `grade_id` = #{gradeId}
+    </select>
+</mapper>
